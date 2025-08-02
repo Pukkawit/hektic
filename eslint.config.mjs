@@ -10,6 +10,12 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    // 👇 THIS will exclude the prisma generated folder from linting
+    ignores: ["src/generated/prisma/**"],
+  },
+
+  // Keep the original config here
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 
