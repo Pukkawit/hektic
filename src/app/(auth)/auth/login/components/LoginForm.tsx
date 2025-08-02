@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { loginWithEmailPassword, loginWithGoogle } from "../actions";
 export const metadata = {
   title: "Login - Hektic SaaS",
   description:
@@ -14,7 +15,7 @@ export const metadata = {
   openGraph: {
     title: "Login - Hektic SaaS",
     description: "Secure login to your Hektic SaaS dashboard.",
-    url: "https://yoursaas.com/login",
+    url: "https://hektic-pukkawit-projects.vercel.app/login",
     siteName: "Hektic SaaS",
     locale: "en_US",
     type: "website",
@@ -39,7 +40,8 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     console.log("Submitting:", data);
-    // We'll hook this to a server action soon
+
+    await loginWithEmailPassword(data);
   };
 
   return (
@@ -76,6 +78,16 @@ export default function LoginForm() {
           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         >
           {isSubmitting ? "Logging in..." : "Login"}
+        </button>
+
+        <div className="text-center text-sm text-gray-500">or</div>
+
+        <button
+          type="button"
+          className="w-full bg-red-500 hover:bg-red-600"
+          onClick={async () => await loginWithGoogle()}
+        >
+          Continue with Google
         </button>
       </form>
     </div>
