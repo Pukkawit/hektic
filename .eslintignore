@@ -1,0 +1,2 @@
+# Exclude Prisma client and types
+src/generated/prisma/*
