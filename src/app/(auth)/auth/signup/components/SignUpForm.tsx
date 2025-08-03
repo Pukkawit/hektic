@@ -1,39 +1,40 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginWithEmailPassword, loginWithGoogle } from "../actions";
+import { z } from "zod";
+import { signUpWithEmailPassword, signUpWithGoogle } from "../actions";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { FaChrome } from "react-icons/fa6";
-import { useRouter } from "next/navigation";
 
-const LoginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
+// Define schema using Zod for validation
+const signUpSchema = z.object({
+  email: z.email("Please enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type LoginFormValues = z.infer<typeof LoginSchema>;
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-export default function LoginForm() {
-  const [error, setError] = useState<string | null>(null);
+export default function SignUpForm() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(LoginSchema),
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
-    const result = await loginWithEmailPassword(data);
-
+  const onSubmit = async (data: SignUpFormValues) => {
+    setError(null); // Clear previous errors
+    const result = await signUpWithEmailPassword(data);
     if (result?.error) {
       setError(result.error);
     } else {
-      router.push("/dashboard"); // redirect to homepage on successful login
+      router.push("/dashboard");
     }
   };
 
@@ -41,11 +42,11 @@ export default function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
         <div className="mb-6 space-y-1 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-            Login to your account
-          </h1>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+            Create your account
+          </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Enter your credentials to access your dashboard
+            Enter your email and password to sign up
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -101,7 +102,7 @@ export default function LoginForm() {
             className="w-full rounded-md bg-blue-600 px-4 py-2 font-semibold text-white shadow-md transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Logging in..." : "Login"}
+            {isSubmitting ? "Signing up..." : "Sign Up"}
           </button>
         </form>
         <div className="relative my-6 flex justify-center text-xs uppercase">
@@ -114,21 +115,22 @@ export default function LoginForm() {
           type="button"
           className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-700"
           onClick={async () => {
-            const result = await loginWithGoogle();
-            if (!result?.error) router.push("/");
+            const result = await signUpWithGoogle();
+            if (!result?.error) router.push("/dashboard");
+            else setError(result.error);
           }}
           disabled={isSubmitting}
         >
           <FaChrome className="mr-2 h-4 w-4" />
-          Continue with Google
+          Sign Up with Google
         </button>
         <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <Link
-            href="/auth/signup"
+            href="/auth/login"
             className="font-medium text-blue-600 underline-offset-2 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            Sign Up
+            Login
           </Link>
         </div>
       </div>

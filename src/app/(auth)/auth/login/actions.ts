@@ -14,11 +14,12 @@ export async function loginWithEmailPassword(data: {
     password: data.password,
   });
 
-  if (error) {
+  if (error !== null && error !== undefined) {
     throw new Error(error.message);
   }
 
   redirect("/dashboard");
+  return error ? { error: error?.message } : { success: true };
 }
 
 export async function loginWithGoogle() {
@@ -36,4 +37,5 @@ export async function loginWithGoogle() {
   }
 
   redirect(data.url);
+  return error ? { error: error?.message } : { success: true };
 }
